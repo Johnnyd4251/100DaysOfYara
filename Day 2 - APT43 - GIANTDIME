@@ -1,0 +1,51 @@
+/*
+JSE file that contains an ePapyrus PDF file that uses base64 to run an embedded PE file stored as variable "xMOj1ABdYgj". Splits commands and file paths into 1-3 character byte sequences that are seperated with a + sign. Removing this layer of deobfuscation results in the following commands:
+
+powershell.exe -windowstyle hidden certutil -decode pimdKdn0w5h \\ wNm0Z2SjNHJ
+powershell.exe -windowstyle hidden rundll32.exe pimdKdn0w5h \\ hOifnpfeFxe UpdateSystem
+powershell.exe -windowstyle hidden cmd.exe /c del /q /f pimdKdn0w5h \\ wNm0Z2SjNHJ
+
+Need to figure out what these variables are...
+
+wNm0Z2SjNHJ = "hmGUEHL.uvCN"
+hOifnpfeFxe = "vuVvMKg.i3IO"
+qG0CLbC5GHR3o.SaveToFile(ikFmtt1u83W+"\\" + hcKwTp5yO0K, 2)
+*/
+
+rule Mal_DPRK_Kimsuky_GIANTDIME {
+
+meta:
+	Author = "John Doyle"
+	Description = "Encoded JScript malware identified by Ahnlabs in December 2023 in 'Kimsuky Targets South Korean Research Institutes with Fake Import Declaration'"
+	Description = "Searches for Korean font family, PDF lure hard-coded name, and obfuscated powershell commands"
+	Reference = "b1361b67025b44a86af61c1863c98fb90b810d2bef6820b6aba7ffc1dc298546"
+	Reference = "https://asec.ahnlab.com/en/59387/"	
+
+strings:
+	$wrapper1 = {68 6c 55 47 46 77 65 58 4a 31 63 79 42 77 5a 47 5a 70 62 79 42 32 4d 79 34 77 4c 6a 6b 75 4e 44 51}	
+	// "ePapyrus pdfio v3.0.9.44"
+	
+	$wrapper2 = "NotoSansCJKkr" base64
+	//Korean font rendering family
+	
+	$wrapper3 = {BC F6 C0 D4 BD C5 B0 ED BC AD}	
+	// hard-coded file name: "수입신고서".pdf
+	
+	$a1 = {43 72 65 61 74 69 6f 6e 44 61 74 65 28 44 3a 32 30 32 33 31 31 31 33 31 35 35 35 30 37 2b 30 39 27 30 30 27} 
+	// CreationDate(D:20231113155507+09'00'
+	
+	$a2 = {52 75 6e 28 22 70 22 20 2b 20 22 6f 22 20 2b 20 22 77 65 22 20 2b 20 22 72 73 22 20 2b 20 22 68 65 6c 22 20 2b 20 22 6c 2e 65 22 20 2b 20 22 78 22 20 2b 20 22 65 20 2d 77 22 20 2b 20 22 69 6e 64 22 20 2b 20 22 6f 77 73 22 20 2b 20 22 74 79 22 20 2b 20 22 6c 65 20 68 22 20 2b 20 22 69 64 22 20 2b 20 22 64 22 20 2b 20 22 65 6e 20 63 22 20 2b 20 22 6d 64 22 20 2b 20 22 2e 65 22 20 2b 20 22 78 22 20 2b 20 22 65 20 2f 22 20 2b 20 22 63 20 64 65 22 20 2b 20 22 6c 20 2f 71 20 22 20 2b 20 22 2f 66} 
+	//Run("p" + "o" + "we" + "rs" + "hel" + "l.e" + "x" + "e -w" + "ind" + "ows" + "ty" + "le h" + "id" + "d" + "en c" + "md" + ".e" + "x" + "e /" + "c de" + "l /q " + "/f
+	
+	$a3 = {52 75 6E 28 22 70 22 20 2B 20 22 6F 22 20 2B 20 22 77 65 22 20 2B 20 22 72 73 22 20 2B 20 22 68 65 6C 22 20 2B 20 22 6C 2E 65 22 20 2B 20 22 78 22 20 2B 20 22 65 20 2D 77 22 20 2B 20 22 69 6E 64 22 20 2B 20 22 6F 77 73 22 20 2B 20 22 74 79 22 20 2B 20 22 6C 65 20 68 22 20 2B 20 22 69 64 22 20 2B 20 22 64 22 20 2B 20 22 65 6E 20 72 22 20 2B 20 22 75 6E 22 20 2B 20 22 64 6C 22 20 2B 20 22 6C 33 22 20 2B 20 22 32 2E 65 22 20 2B 20 22 78 22 20 2B 20 22 65 20 22} 
+	// Run("p" + "o" + "we" + "rs" + "hel" + "l.e" + "x" + "e -w" + "ind" + "ows" + "ty" + "le h" + "id" + "d" + "en r" + "un" + "dl" + "l3" + "2.e" + "x" + "e "
+	
+	$a4 = {52 75 6E 28 22 70 22 20 2B 20 22 6F 77 22 20 2B 20 22 65 72 73 22 20 2B 20 22 68 65 6C 22 20 2B 20 22 6C 2E 65 22 20 2B 20 22 78 22 20 2B 20 22 65 20 2D 77 22 20 2B 20 22 69 6E 64 22 20 2B 20 22 6F 77 73 22 20 2B 20 22 74 79 22 20 2B 20 22 6C 65 20 68 22 20 2B 20 22 69 64 22 20 2B 20 22 64 65 6E 20 63 22 20 2B 20 22 65 22 20 2B 20 22 72 74 75 22 20 2B 20 22 74 69 22 20 2B 20 22 6C 20 2D 64 22 20 2B 20 22 65 63 22 20 2B 20 22 6F 64 22 20 2B 20 22 65 20 22} 
+	// Run("p" + "ow" + "ers" + "hel" + "l.e" + "x" + "e -w" + "ind" + "ows" + "ty" + "le h" + "id" + "den c" + "e" + "rtu" + "ti" + "l -d" + "ec" + "od" + "e "
+	
+	$a5 = "10*1000"
+
+condition:
+	2 of ($wrapper*) and 1 of ($a*)	
+
+}
