@@ -1,0 +1,33 @@
+rule MAL_Ransomware_Darkside_Str : Darkside {
+    meta:
+        desc = "This rule looks for strings from a Darkside ransomware sample."
+        ref = "da3bb9669fb983ad8d2ffc01aab9d56198bd9cedf2cc4387f19f4604a070a9b5"
+
+    strings:
+	
+		$a1 = "pthread_mutex_destroy"
+		$a2 = "__gmon_start__"
+		$a3 = "[INFO] [%ThreadID%] %Message%"
+
+		$lib1 = "libm.so.6"
+		$lib2 = "libgcc_s.so.1"
+		$lib3 = "sse_simd.cpp"
+
+		$var1 = "iswalnum"
+		$var2 = "asio"
+		$var3 = "rubberhose"
+		$var4 = "Help Screen"
+		$var5 = "/tmp/software.log"
+		$var6 = "darkside_readme.txt"
+		$var7 = "darkside"
+		$var8 = "[ Welcome to DarkSide ]"
+		$var9 = "darksidfqzcuhtk2" //URL
+		$var10 = ".onion" //URL
+		$var11 = "B69Q1UI7FTR7GBNM08Y61RV3YKYIE62POYGBVE93EYFTPQZLWTXR4X7ZHS3U24ZJ" //URL
+		$var12 = "PgIAxDLHzRBDv5o7Vig18SbVmq1qcEu9HsTntjyBqxhnnwWyjxApsY2HT3pK3oIalb9zqbA4j1eGmiWR66X9DN7EukLCkowwM7RICR4D9qjNjLbn8c5MwyMkX05sY4uwBNKByivNh82hEySNXSnezWmTPKpqrBD5abDJp4IyXl8Z2XAtuSw9AeyTczEkZvGFwbapJ26Msu9v5mGcTYQ1BcramQkzfO50HcAuUWyksR5IEC7rLeWg4Nd8gTvgVRFmGEYgkfUrRvP5ZRahWCTNbu6WaXiHNHPrV90GJMdkDAqr7q4yN0MrGDiK8VVP60Gdqj9e8o9T0Q5xb8a97FksTzlUU4ISnpISmJqJ6sNuJYhnzpMt6DeV7M4q06U9THgAgxOnAMTVoXoZg8ekecZ1afysA2Zwa8jjqbn34dR36W96mFVlZJon776mdnqc0O1pLnMXHr8gB0QUKnSkAJQasUhcGJewGoBpioakie9nvFidiXnVHTspyqbPehbyB4geScdgrZlAraZqHnzLld6PNRjR0IXh4FqGU5Fvx69eNWlcxIt2iffqWbk" //PGP Key
+			
+    condition:
+        3 of ($var*) and 1 of ($lib*, $a*) 
+}
+
+
