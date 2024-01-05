@@ -1,0 +1,52 @@
+rule Win_Registry_Autorun_Additions {
+
+	meta:
+		Author = "John Doyle"
+		Description = "Generic rule to detect against T1547.001 - Registry Run Keys (not Startup Folder entries also) and T1112 - Modify Registry"
+		Description = "Inspired by Andrew Northern @ex_raritas | https://x.com/ex_raritas/status/1743051593937727754?s=20"
+    Reference = "https://attack.mitre.org/techniques/T1547/001/"
+		Reference = "https://attack.mitre.org/techniques/T1112/"
+		Reference = "https://ss64.com/nt/reg.html"
+		Reference = "https://www.windowscentral.com/software-apps/customize-spotify-windows-spicetify"
+		Reference = "https://ss64.com/nt/regini.html"
+		Reference = "https://www.sharepointdiary.com/2021/04/manage-windows-registry-in-powershell.html"
+
+	strings:
+		$reg_invoke1 = /reg[.exe]{0,4} add/ ascii wide nocase	// Accounts for reg and reg.exe 
+		$reg_invoke2 = /reg[ini.exe]{0,7} add/ ascii wide nocase	// Accounts for regini and regini.exe
+		//base64 and base64wide only can be used with a text string, not with a regex, so no $reg_invoke[1 || 2]_b64 exist
+
+		$powershell_invoke1 = "New-Item -Path" ascii wide nocase	// ex) New-Item -Path "Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\MyApplication
+		$powershell_invoke2 = "Set-ItemProperty -Path" ascii wide nocase	// ex) Set-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\MyApplication" -Name "Version" -Value "2.0"
+		$powershell_invoke1_b64 = "New-Item -Path" base64 base64wide	
+		$powershell_invoke2_b64 = "Set-ItemProperty -Path" base64 base64wide
+
+		//All $reg_key* variables below cover multiple hives and permutations of hive names for HKEY_CURRENT_USER, HKCU, HKEY_LOCAL_MACHINE, HKLM, HKEY_Users, and HKU. Key names are case insensitive, so adding nocase to all below.
+
+		$reg_key1 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" ascii wide nocase
+		$reg_key2 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" ascii wide nocase
+		$reg_key3 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx" ascii wide nocase
+		$reg_key4 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load" ascii wide nocase
+		$reg_key5 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders" ascii wide nocase
+		$reg_key6 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders" ascii wide nocase
+		$reg_key7 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServicesOnce" ascii wide nocase
+		$reg_key8 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServices" ascii wide nocase
+		$reg_key9 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" ascii wide nocase
+		$reg_key10 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" ascii wide nocase
+
+		$reg_key1_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" base64 base64wide
+		$reg_key2_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" base64 base64wide
+		$reg_key3_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx" base64 base64wide
+		$reg_key4_b64 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\load" base64 base64wide
+		$reg_key5_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders" base64 base64wide
+		$reg_key6_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders" base64 base64wide
+		$reg_key7_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServicesOnce" base64 base64wide
+		$reg_key8_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServices" base64 base64wide
+		$reg_key9_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" base64 base64wide
+		$reg_key10_b64 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" base64 base64wide
+		
+	condition:
+		1 of ($reg_invoke*, $powershell_invoke*) and 
+		1 of ($reg_key*) 
+
+	}
