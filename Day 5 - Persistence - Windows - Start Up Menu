@@ -1,0 +1,16 @@
+rule Win_Start_Up_Folders {
+
+	meta:
+		Author = "John Doyle"
+		Description = "Generic rule to detect against T1547.001 - Startup Folder entries only"
+		Reference = "https://attack.mitre.org/techniques/T1547/001/"
+		Reference = "https://www.thewindowsclub.com/startup-folder-in-windows-8"
+
+	strings:
+		$file_system_change1 = "\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup" ascii wide nocase // ex) shell:startup
+		$file_system_change2 = "\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp" ascii wide nocase	// ex) shell:common startup
+
+	condition:
+		1 of ($file_system_change*)
+
+	}
