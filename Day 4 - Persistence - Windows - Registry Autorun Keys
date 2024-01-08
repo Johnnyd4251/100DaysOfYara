@@ -33,6 +33,9 @@ rule Win_Registry_Autorun_Additions {
 		$reg_key8 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServices" ascii wide nocase
 		$reg_key9 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" ascii wide nocase
 		$reg_key10 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" ascii wide nocase
+		$reg_key11 = "\\Windows NT\\CurrentVersion\\Schedule\\TaskCache" ascii wide nocase // HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks% and HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree%
+		$reg_key12 = "\\Software\\Microsoft\\WindowsNT\\CurrentVersion\\Windows\\load" ascii wide nocase
+		$reg_key13 = "\\Microsoft\\WindowsNT\\CurrentVersion\\Winlogon\\Userinit" ascii wide nocase
 
 		$reg_key1_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" base64 base64wide
 		$reg_key2_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" base64 base64wide
@@ -44,6 +47,9 @@ rule Win_Registry_Autorun_Additions {
 		$reg_key8_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunServices" base64 base64wide
 		$reg_key9_b64 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" base64 base64wide
 		$reg_key10_b64 = "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" base64 base64wide
+		$reg_key11_b64 = "\\Windows NT\\CurrentVersion\\Schedule\\TaskCache" base64 base64wide
+		$reg_key12_b64 = "\\Software\\Microsoft\\WindowsNT\\CurrentVersion\\Windows\\load" base64 base64wide
+		$reg_key13_b64 = "\\Microsoft\\WindowsNT\\CurrentVersion\\Winlogon\\Userinit" base64 base64wide
 		
 	condition:
 		1 of ($reg_invoke*, $powershell_invoke*) and 
