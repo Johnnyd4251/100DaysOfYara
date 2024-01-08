@@ -1,0 +1,80 @@
+rule Win_Generic_Scheduled_Tasks {
+
+meta:
+Description = "Generic rule to detect against T1053.005  Scheduled Task using traditional and non-traditional invokations. Well documented scheduling often occurs through schtasks, sc, and the legacy AT utility. WMI/WMIC can also be used in a stealhier way that is largely not documented. Similarly, underpinning library calls may allow for indirect registration through schtasks, sc, or AT without triggering end point alerts."
+Reference = "https://attack.mitre.org/techniques/T1053/005/"
+wmi_Reference = "https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-tasks--scheduled-tasks"
+wmi_Reference = "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/register-wmievent?view=powershell-5.1"
+wmi_Reference = "https://learn-powershell.net/2013/08/14/powershell-and-events-permanent-wmi-event-subscriptions"
+ps_Reference = "https://learn.microsoft.com/en-us/powershell/module/psscheduledjob/about/about_scheduled_jobs?view=powershell-5.1"
+ps_Reference = "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/register-objectevent?view=powershell-7.4"
+ps_Reference = "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-service?view=powershell-7.4"
+taskschd_Reference = "https://learn.microsoft.com/en-us/windows/win32/TaskSchd/task-scheduler-start-page"
+schedsvc_Reference ="https://techcommunity.microsoft.com/t5/ask-the-performance-team/task-scheduler-changes-in-windows-vista-and-windows-server-2008/ba-p/373637"
+Host_Artifact_Locations ="\\Windows\\System32\\Tasks or \\Windows\\Tasks and AppData\\Local\\Microsoft\\Windows\\PowerShell\\ScheduledJobs and in Windows\\Autochk\\Scheduled on Server*"
+Additional_Reference = "Red Canary Atomics for T1053.005 - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1053.005/T1053.005.md"
+
+strings: 
+
+$win_util1 = "schtasks" ascii wide nocase	// catches permutations: schtasks and schtasks.exe
+$win_util2 = "sc" ascii wide nocase fullword 
+$win_util3 = "at" ascii wide nocase fullword 
+$win_util_Param1 = "create" ascii wide nocase fullword 
+
+$win_util1_b64 = "schtasks" base64 base64wide
+$win_util2_b64 = "sc" base64 base64wide
+$win_util3_b64 = "at" base64 base64wide 
+$win_util_Param1_b64 = "create" base64 base64wide 
+
+$win_host_invokation1 = "TaskScheduler.dll" ascii wide nocase
+$win_host_invokation2 = "Taskschd.dll" ascii wide nocase	// taskschd.dll is part of Task Scheduler COM API
+$win_host_invokation3 = "schedsvc.dll"	ascii wide nocase	// Previously exploited for privesc to SYSTEM - https://www.zerodayinitiative.com/blog/2019/6/11/exploiting-the-windows-task-scheduler-through-cve-2019-1069
+$win_host_invokation4 = "taskcomp.dll"	ascii wide nocase
+
+$win_host_invokation1_b64 = "TaskScheduler.dll" base64 base64wide
+$win_host_invokation2_b64 = "Taskschd.dll" base64 base64wide
+$win_host_invokation3_b64 = "schedsvc.dll" base64 base64wide
+$win_host_invokation4_b64 = "taskcomp.dll" base64 base64wide
+
+$vbs_scheduling1 = "New-Object -ComObject" ascii wide nocase
+$vbs_scheduling2 = "CreateObject(" ascii wide nocase
+
+$vbs_scheduling1_b64 = "New-Object -ComObject" base64 base64wide
+$vbs_scheduling2_b64 = "CreateObject(" base64 base64wide
+
+$ps_scheduling1 = "Register-ScheduledJob" ascii wide nocase
+$ps_scheduling2 = "New-JobTrigger"  ascii wide nocase
+$ps_scheduling3 = "New-ScheduledJobOption"  ascii wide nocase
+$ps_scheduling4 = "AppData\\Local\\Microsoft\\Windows\\PowerShell\\ScheduledJobs"  ascii wide nocase
+$ps_scheduling5 = "Register-ScheduledTask" ascii wide nocase
+$ps_scheduling6 = "Register-ObjectEvent" ascii wide nocase	// potential high FP rate, might require tuning
+$ps_scheduling7 = "New-Service -Name" ascii wide nocase
+$ps_scheduling8 = "New-ScheduledTaskTrigger -AtLogon" ascii wide nocase
+$ps_scheduling9 = "Invoke-CimMethod -ClassName PS_ScheduledTask -NameSpace \"Root\\Microsoft\\Windows\\TaskScheduler\"" ascii wide nocase
+
+$ps_scheduling1_b64 = "Register-ScheduledJob" base64 base64wide
+$ps_scheduling2_b64 = "New-JobTrigger" base64 base64wide
+$ps_scheduling3_b64 = "New-ScheduledJobOption" base64 base64wide
+$ps_scheduling4_b64 = "AppData\\Local\\Microsoft\\Windows\\PowerShell\\ScheduledJobs" base64 base64wide
+$ps_scheduling5_b64 = "Register-ScheduledTask" base64 base64wide
+$ps_scheduling6_b64 = "Register-ObjectEvent" base64 base64wide
+$ps_scheduling7_b64 = "New-Service -Name" base64 base64wide
+$ps_scheduling8_b64 = "New-ScheduledTaskTrigger -AtLogon" base64 base64wide
+$ps_scheduling9_b64 = "Invoke-CimMethod -ClassName PS_ScheduledTask -NameSpace \"Root\\Microsoft\\Windows\\TaskScheduler\"" base64 base64wide
+
+$wmi_scheduling1 = "Win32_ScheduledJob" ascii wide nocase
+$wmi_scheduling2 = "objNewJob.Create" ascii wide nocase
+$wmi_scheduling3 = "Register-WmiEvent" ascii wide nocase
+$wmi_scheduling4 = "Set-WMIInstance" ascii wide nocase
+
+condition:
+//Conditions require tuning. The rule works well as a generic catch all, but yields a considerable number of results. 
+//Future modifications include adding magic bytes for ps and vbs/vba rules. Need to example more samples for wmi and win_host_invokation before developing heuristics. 
+(1 of ($win_util1, $win_util2, $win_util3) and  $win_util_Param1) or 
+(1 of ($win_util1_b64, $win_util2_b64, $win_util3_b64) and  $win_util_Param1_64) or
+1 of ($win_host_invokation*) or
+1 of ($vbs_scheduling*) or
+1 of ($ps_scheduling*) or
+1 of ($wmi_scheduling*)
+
+}
