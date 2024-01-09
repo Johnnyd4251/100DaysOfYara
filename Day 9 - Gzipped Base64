@@ -3,7 +3,7 @@ rule find_gzipped_base64_strings {
 	meta:
 	Author = "John Doyle"
 	Description = "Uses regular expressions to identify any gzipped Base64 strings"
-  Description = "Fun decoding challenge from @impostcost here that uses construct https://www.imposecost.net/post/walk-through-2024-01-06-decoding-challenge" 
+	Description = "Fun decoding challenge from @impostcost here that uses construct https://www.imposecost.net/post/walk-through-2024-01-06-decoding-challenge" 
 
 	strings:
 	$gzip_b64 = /^H4sIA/
