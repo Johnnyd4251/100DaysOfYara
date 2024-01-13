@@ -1,0 +1,9 @@
+import "pe"
+import "time"
+
+rule cert_valid {
+
+    condition:
+        time.now() > pe.signatures[0].not_after
+
+}
