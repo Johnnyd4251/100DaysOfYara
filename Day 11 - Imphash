@@ -1,0 +1,9 @@
+import "pe"
+
+rule imphash_test {
+    meta: 
+    Reference = "d6a53aa10bc1c4ef5fbd4d24459b1bc997ae7081fe91285930581dafb388dc3f" // Original Oilrig sample, should find at least one other related sample
+    
+    condition:
+    pe.is_pe and pe.imphash() == "caf2bfc065ddbf6ede21df3a6a9c8fa5"
+} 
