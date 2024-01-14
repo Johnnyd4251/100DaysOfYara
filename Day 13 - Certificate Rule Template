@@ -1,0 +1,23 @@
+import "pe"
+
+rule certificate_rule_template {
+
+	meta: 
+	Description = "Template for code signing certificate detection"
+	
+	condition:
+	  pe.number_of_signatures > 0 and 
+		for any thing in pe.signatures:
+			(
+			thing.serial == "42:6e:86:60:53:09:73:ac:4e:fd:3b:0d:41:f1:c6:1f"
+			
+			// Other certification options to potentially call
+			// thing.not_after == "" and 
+			// thing.not_before == "" and 
+			// subject contains "" and 
+			// issuer contains "" and
+			// thumbprint == ""
+
+			)
+
+}
