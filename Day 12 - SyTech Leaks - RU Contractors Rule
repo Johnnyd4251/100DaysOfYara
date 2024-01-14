@@ -1,0 +1,45 @@
+rule bye_bye_bye_RU_FIS {
+
+  meta: 
+    Description = "Derived from exploiting the SyTech leaked documents. The documents were uploaded to megaupload, but they removed it for terms violation. The Twitter account @D1G1R3V which posted it was also suspended. All of the Other_SyTech_RU_Gov_* come from the leaks, but the other contractors may not be located in them" 
+    Reference = "SyTech leaks, 13 July 2019, by the Digital Revolution (@D1G1R3V) on @0v1ruS Twitter account" 
+    Reference ="https://web.archive.org/web/20190722033238/http://www.d1g1r3v.net/ -> News"
+    Reference = "https://vk.com/d1g1r3v"
+    Reference = "https://twitter.com/swithak/status/1152482857966874625"
+    Reference = "Probably related since Elon's bitch ass suspended the @D1G1R3V account - https://telemetr.io/en/channels/1231045072-d1g1r3v"
+    Other_SyTech_RU_Gov_Client = "Ministry of Internal Affairs of the Russian Federation (Министерство внутренних дел РФ)"
+    Other_SyTech_RU_Gov_Client = "Federal Customs Service of the Russian Federation (Федеральная таможенная служба РФ)"
+    Other_SyTech_RU_Gov_Client = "Federal Security Service of the Russian Federation (Федеральная служба безопасности РФ)"
+    Other_SyTech_RU_Gov_Client = "Federal Security Service of the Russian Federation (Федеральная служба охраны РФ)"
+    Other_SyTech_RU_Gov_Client = "Federal Drug Control Service of the Russian Federation (Федеральная служба РФ по контролю за оборотом наркотиков)"
+    Other_SyTech_RU_Gov_Client = "Border Service of the Federal Security Service of the Russian Federation (Пограничная служба Федеральной службы безопасности РФ)"
+    Other_SyTech_RU_Gov_Client = "Federal Service of the Russian Federation for Financial Monitoring (Федеральная служба РФ по финансовому мониторингу)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "ROSTELECOM (ОАО «РОСТЕЛЕКОМ»)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "CenterTelecom OJSC (ОАО «ЦентрТелеком»)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "OJSC North-West Telecom (ОАО «Северо-западный Телеком»)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "OJSC Volga Telecom (ОАО «Волга Телеком»)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "OJSC "Mobile TeleSystems" (ОАО «Мобильные ТелеСистемы»)"
+    Other_SyTech_RU_Gov_Adjacent_Client = "OJSC "MEGAFON" (ОАО «МЕГАФОН»)"
+    Potential_Other_Contractors = "Pasit - Акционерное Общество "Пасит""
+    Potential_Other_Contractors = "Neobit" 
+    Potential_Other_Contractors = "Advanced Systems Technology (Russian: АКЦИОНЕРНОЕ ОБЩЕСТВО АСТ)"
+    Potential_Other_Contractors = "Pozitiv Teknolodzhiz (Positive Technologies)"
+
+  strings:
+    $FSUE = "ФГКУ" // Federal State Unitary Enterprise (FSUE)
+    $Mil_Designator1 = "в/ч 71330" // Military Unit 71330 aka public cover designator used for the Federal Security Service (FSB) Center 16 aka the Center for Electronic Surveillance of Communications (TSRRSS)
+    $Mil_Designator2 = "в/ч 43753" // Military Unit 71330 aka public cover designator used for the Federal Security Service (FSB) Center 8
+
+    $National_Lab1 = "НИИ Квант" // Kvant aka Quantum from https://web.archive.org/web/20190630234352/https://www.d1g1r3v.net/madskillz
+    $National_Lab2 = "ЦентрИнформ" // CenterInform
+    $National_Lab3 = "Сайтэк" // SyTech
+
+    $Classification1 = "Секретно" // "Secret" as in classification level
+    $Classification2 = "совершенно секретно" // "Top Secret" as in classification level
+
+    $Cyber_Ops1 = "переполнение буфера" // buffer overflow 
+
+  condition:
+    $FSUE and 1 of ($Mil_Designator*) and (1 of ($Classification*) or $Cyber_Ops1)
+
+}
