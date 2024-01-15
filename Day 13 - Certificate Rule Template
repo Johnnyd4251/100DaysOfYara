@@ -7,6 +7,7 @@ rule certificate_rule_template {
 	
 	condition:
 	  pe.number_of_signatures > 0 and 
+
 		for any thing in pe.signatures:
 			(
 			thing.serial == "42:6e:86:60:53:09:73:ac:4e:fd:3b:0d:41:f1:c6:1f"
@@ -19,5 +20,8 @@ rule certificate_rule_template {
 			// thumbprint == ""
 
 			)
+
+		// An alternative approach would be to call certificate array and the specific sub-property, but this would result false negatives, missing certain files that match due to the specificity in certificate placement [0] vs. [1] vs. [n] 
+		// pe.signatures[0].subject == "/C=US/ST=Washington/L=Redmond/O=Microsoft Corporation/CN=Microsoft Windows Hardware Compatibility Publisher"
 
 }
