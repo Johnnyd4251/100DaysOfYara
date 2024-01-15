@@ -1,0 +1,21 @@
+rule Gen_Win_Svchost_Masquerade {
+
+	meta:
+		Description = "Odd file size, VersionInfo, manifest, and install path"
+		ref = "D723B7C150427A83D8A08DC613F68675690FA0F5B10287B078F7E8D50D1A363F"
+	
+  strings:
+		$a1 = "C:\\Users\\" nocase // Install path variance from where legit version should live
+		$legit1 = "<!-- Copyright (c) Microsoft Corporation -->" // Manifest mismatch
+		$legit2 = "name=\"Microsoft.Windows.Services.SvcHost\""  // Manifest mismatch
+	
+	condition: 
+		uint16be(0) == 0x4d5a and
+		filesize > 2MB and 
+		(
+		pe.version_info["InternalName"] icontains "svchost" or
+		pe.version_info["OriginalFilename"] icontains "svchost"
+		)
+		and $a1 and not any of ($legit*)
+
+	}
