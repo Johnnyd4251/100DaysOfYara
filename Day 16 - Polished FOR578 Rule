@@ -1,0 +1,19 @@
+rule FOR578_Capstone_3_Char_PDB_Path_and_Dropper_Location {
+
+	meta:
+		Description = "Produced by team EuropeNDown for the SANS FOR578 Day 6 Capstone. Designed to trigger on files found with 3 character PDB paths."
+		References = "REDACTED - Internal Sourcing"
+		References = "https://www.linkedin.com/feed/update/urn:li:activity:7161007345517367296/"
+		References = "https://twitter.com/_John_Doyle/status/1754744618468442259"
+		Related_Samples = "42cfa*, 66156*, 663d8*, 67fc6*, 7f33b*, 96331*, a97cb*, af62c*, c224b*, c2b8e*, d537a*, e95ad*, fa40d*" /* All of the hashes are fabricated for the purpose of this exercise, so listing them out provides no additional value */ 
+
+	strings:
+		$file_path1 = "C:\\Users\\"
+		$file_path2 = "\\Desktop\\"	// Looking for installation paths found within the samples
+
+		$pdb_string = /[a-zA-Z]{3}.pdb/	// Looking for .NET compiler artifacts that match a certain pattern
+
+	condition:
+		1 of ($file_path*) and $pdb_string
+
+}
