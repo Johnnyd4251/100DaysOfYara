@@ -1,0 +1,12 @@
+rule generic_dropper {
+
+  meta:
+    Description = "Looks for a PE binary containing another PE binary"
+
+  strings:
+    $pe_stub = "This program cannot be run in DOS mode"
+
+  condition:
+    #pe_stub > 2
+
+}
