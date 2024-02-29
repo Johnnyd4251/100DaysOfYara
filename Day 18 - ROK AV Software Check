@@ -1,0 +1,14 @@
+rule ROK_Targeting_AV_Check {
+
+	meta:
+		Description = "Looks for malware likely targeting Republic of Korea (ROK) aka South Korean victims by performing a check or attempt to disable common anti-virus vernacular in South Korean for AV aka '왁찐' or '백신'. The term literally translates to the Engish vaccine. This rule *may* also find attempt to disable DPRK AV since they also use '왁찐' as well as '實利'."
+		Referrence = "https://twitter.com/mstoned7/status/1762986130734219444"
+		Related_Referrence = "DPRK's homemade AV Silivaccine - https://research.checkpoint.com/2018/silivaccine-a-look-inside-north-koreas-anti-virus/"
+
+	strings:
+		$vaccine_1 = "왁찐" 
+		$vaccine_2 = "백신"
+
+	condition:
+		1 of them
+}
