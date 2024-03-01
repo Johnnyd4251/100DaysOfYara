@@ -10,5 +10,6 @@ rule ROK_Targeting_AV_Check {
 		$vaccine_2 = "백신"
 
 	condition:
+		uint16be(0) == 0x4d5a and
 		1 of them
 }
